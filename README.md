@@ -16,9 +16,9 @@ Both the CLI and generated swarm projects have dependencies that require Node 8.
 with NPM 5.5.1 or higher.
 
 ## Table of Contents
-* [Usage](#usage)
-* [Injecting Variables](#injecting%20variables)
-* [License](#license)
+* [Usage](##usage)
+* [Injecting Variables](##injecting-variables)
+* [License](##license)
 
 ## Usage
 
