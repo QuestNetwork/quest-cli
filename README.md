@@ -26,7 +26,7 @@ with NPM 5.5.1 or higher.
 node .
 ```
 
-### Injecting Swarm Info
+## Injecting Swarm Info
 
 You can add arbitrary swarm info variables that will be copied into selected packages swarm.json:
 
