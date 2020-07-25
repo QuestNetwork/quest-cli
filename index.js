@@ -435,7 +435,7 @@ async function deploySwarm(deployQueue = deployQueueJSON){
   }
 
   let timeInMinutes = timestamp_end-timestamp_start;
-      timeInMinutes = timeInMinutes/6000;
+      timeInMinutes = timeInMinutes/60000;
 
   console.log('');
   console.log('Took '+timeInMinutes+' Minutes.');
