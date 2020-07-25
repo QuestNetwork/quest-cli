@@ -12,6 +12,7 @@ with NPM 5.5.1 or higher.
 
 ## Table of Contents
 * [Usage](#usage)
+* [Package Requirements](#package-requirements)
 * [Injecting Variables](#injecting-variables)
 * [License](#license)
 
@@ -20,6 +21,13 @@ with NPM 5.5.1 or higher.
 ```bash
 node .
 ```
+
+## Package Requirements
+
+Since many different swarm packages have different deployment flows, we're calling the deploy and hibernate scripts from the respective package.json
+
+Please make sure, your packages have npm compliant package.json files with a ```"deploy"``` and ```"hibernate"``` script.
+
 
 ## Injecting Variables
 
