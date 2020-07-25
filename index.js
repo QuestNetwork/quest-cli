@@ -16,7 +16,7 @@ let retrySettings;
 let projectFolder;
 let projectsRoot;
 let cliSwarmJson = {};
-const cliName = "QuestNetwork";
+const cliName = "QuestCli";
 
 
 coldStart();
