@@ -17,7 +17,7 @@ with NPM 5.5.1 or higher.
 
 ## Table of Contents
 * [Usage](#usage)
-* [Injecting Variables](#injecting)
+* [Injecting Variables](#injecting%20variables)
 * [License](#license)
 
 ## Usage
