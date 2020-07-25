@@ -1,0 +1,17 @@
+{
+  "name": "swarmCli",
+  "version": "0.9.1",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "StationedInTheField.com",
+  "license": "MIT",
+  "dependencies": {
+    "await-exec": "^0.1.2",
+    "chalk": "^4.1.0",
+    "cli-select": "^1.1.2",
+    "enquirer": "^2.3.6",
+    "figlet": "^1.5.0",
+    "fs": "0.0.1-security"
+  }
+}
