@@ -41,7 +41,7 @@ async function coldStart(){
       cliSwarmJson = {
         version: "0.9.1",
         type: "cliSettings",
-        name: "swarmCli",
+        name: "questCli",
       };
 
 
@@ -115,7 +115,7 @@ async function setProject(projectFolder, newSwarmJson = undefined){
   }
 
   swarmJson = newSwarmJson;
-  swarmInfoQueue = newSwarmJson.copy;
+  swarmInfoQueue = newSwarmJson.injectInfo;
   deployQueueJSON = newSwarmJson.packages;
   // console.log(deployQueueJSON);
   retrySettings =  newSwarmJson.retrySettings;
@@ -187,6 +187,11 @@ async function selectProject(){
   }
   catch(error){
     console.clear();
+    await delay(500);
+    console.log("See ya!");
+    await delay(500);
+    console.clear();
+
   }
 
 
@@ -249,7 +254,7 @@ async function welcome(){
   values.push("New Package");
 
   if(typeof(swarmJson.packages) != "undefined" && swarmJson.packages.length > 0){
-    values.push("Edit Package");
+    // values.push("Edit Package");
     values.push("Remove Packages");
   }
 
@@ -566,7 +571,14 @@ async function newPackage(){
       message: 'What is the name for this package?',
       initial: 'myPackage'
     });
-    let choice = await packagePrompt.run();
+    let choice;
+    try{
+      choice = await packagePrompt.run();
+    }
+    catch(error){
+      welcome();
+      return false;
+    }
     let newPackageName = choice;
 
     let projectSwarmJson = JSON.parse(fs.readFileSync(projectsRoot+projectFolder+'/swarm.json'));      // console.log(res.stdout + res.stderr);
@@ -646,8 +658,8 @@ async function removePackages(){
     }
   }
   catch(error){
-    console.log(error);
+    // console.log(error);
+    welcome();
     return false;
-    removePackages();
   }
 }
