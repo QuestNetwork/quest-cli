@@ -1,5 +1,5 @@
 {
-  "name": "swarmCli",
+  "name": "quest-cli",
   "version": "0.9.1",
   "description": "Swarm CLI for Quest Network apps in Node.js",
   "main": "index.js",
