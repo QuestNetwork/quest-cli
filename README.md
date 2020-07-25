@@ -1,10 +1,5 @@
 ## Quest Network CLI
 
-<!-- Badges section here. -->
-[![GitHub forks](https://github.com/QuestNetwork/quest-cli.svg?style=social&label=Fork)](https://github.com/QuestNetwork/quest-cli/fork)
-[![GitHub stars](https://github.com/QuestNetwork/quest-cli.svg?style=social&label=Star)](https://github.com/QuestNetwork/quest-cli)
-
-
 ## Note
 If you wish to collaborate, check out [our issue list](https://github.com/QuestNetwork/quest-cli/issues).
 
