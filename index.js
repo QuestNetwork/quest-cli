@@ -5,6 +5,7 @@ const cliSelect = require('cli-select');
 const { MultiSelect } = require('enquirer');
 const { Select } = require('enquirer');
 const { Input } = require('enquirer');
+const { spawn } = require('child_process');
 
 const fs = require('fs');
 
@@ -17,7 +18,7 @@ let projectFolder;
 let projectsRoot;
 let cliSwarmJson = {};
 const cliName = "QuestCli";
-
+const version = "0.9.2";
 
 coldStart();
 
@@ -39,7 +40,7 @@ async function coldStart(){
   catch(error){
     //no swarm json file, make one
       cliSwarmJson = {
-        version: "0.9.1",
+        version: version,
         type: "cliSettings",
         name: "questCli",
       };
@@ -215,7 +216,7 @@ async function newSwarm(){
 
   //write to file
   let projectSwarmJson = {
-    version: "0.9.1",
+    version: version,
     type: "swarmProject",
     name: newSwarmName,
     retrySettings: {
@@ -244,11 +245,19 @@ async function welcome(){
   console.log(chalk.yellow("Swarm: "+projectFolder));
 
   let values = [];
+  if(typeof(swarmJson.apps) != "undefined" && swarmJson.apps.length > 0){
+    values.push("Run Swarm Apps Locally");
+  }
+
+  values.push("New App");
+  values.push("Remove Apps");
+
 
   if(typeof(swarmJson.packages) != "undefined" && swarmJson.packages.length > 0){
     values.push("Deploy All Swarm Packages");
     values.push("Deploy Swarm Packages");
     values.push("Hibernate All Swarm Packages");
+    values.push("Run Swarm Packages Locally");
   }
 
   values.push("New Package");
@@ -282,8 +291,20 @@ async function welcome(){
     else if(sel.value == "New Package"){
       newPackage();
     }
+    else if(sel.value == "New App"){
+      newApp();
+    }
+    else if(sel.value == "Remove Apps"){
+      removeApps();
+    }
     else if(sel.value == "Remove Packages"){
       removePackages();
+    }
+    else if(sel.value == "Run Swarm Apps Locally"){
+      runAppsLocal();
+    }
+    else if(sel.value == "Run Swarm Packages Locally"){
+      runPackagesLocal();
     }
   }
   catch(error){
@@ -364,7 +385,7 @@ async function deploySwarm(deployQueue = deployQueueJSON){
 
   for(var i = 0; i < swarmInfoQueue.length; i++) {
 
-    if((typeof(swarmInfoQueue[i]['scope']) == 'undefined' || swarmInfoQueue[i]['scope'] != 'global') && !isInArray(swarmInfoQueue[i]['package'],deployQueue)){ continue; }
+    if(typeof(swarmInfoQueue[i]['app']) != 'undefined' || (typeof(swarmInfoQueue[i]['scope']) == 'undefined' || swarmInfoQueue[i]['scope'] != 'global') && !isInArray(swarmInfoQueue[i]['package'],deployQueue)){ continue; }
 
     console.log("Copying swarm info for "+swarmInfoQueue[i]['package']+"...");
 
@@ -601,6 +622,49 @@ async function newPackage(){
 
 
 
+async function newApp(){
+
+
+    console.clear();
+    console.log(
+      chalk.yellow(
+        figlet.textSync(cliName, { horizontalLayout: 'full' })
+      )
+    );
+
+    let packagePrompt = new Input({
+      message: 'What is the name for this app?',
+      initial: 'myApp'
+    });
+    let choice;
+    try{
+      choice = await packagePrompt.run();
+    }
+    catch(error){
+      welcome();
+      return false;
+    }
+    let newPackageName = choice;
+
+    let projectSwarmJson = JSON.parse(fs.readFileSync(projectsRoot+projectFolder+'/swarm.json'));      // console.log(res.stdout + res.stderr);
+    if(typeof(projectSwarmJson['apps']) == 'undefined'){
+      projectSwarmJson['apps'] = [];
+    }
+
+    projectSwarmJson['apps'].push({name: newPackageName, folder: newPackageName, local: "npm run web"});
+
+    console.log("Creating App...");
+    fs.mkdirSync(projectsRoot+projectFolder+"/"+newPackageName);
+    fs.writeFileSync(projectsRoot+projectFolder+'/swarm.json', JSON.stringify(projectSwarmJson, null, 2));      // console.log(res.stdout + res.stderr);
+    await delay(1000);
+    setProject(projectFolder, projectSwarmJson);
+    welcome();
+
+
+}
+
+
+
 async function removePackages(){
 
   console.clear();
@@ -660,6 +724,334 @@ async function removePackages(){
   catch(error){
     // console.log(error);
     welcome();
+    return false;
+  }
+}
+
+
+
+async function removeApps(){
+
+  console.clear();
+  console.log(
+    chalk.yellow(
+      figlet.textSync(cliName, { horizontalLayout: 'full' })
+    )
+  );
+
+
+  let choices = [];
+  for(var i = 0; i < swarmJson.apps.length; i++) {
+    choices.push({name:swarmJson.apps[i]['name'], value: swarmJson.apps[i]['folder']});
+  }
+
+  let prompt = new MultiSelect({
+    name: 'value',
+    message: 'Pick apps to remove!',
+    limit: deployQueueJSON.length,
+    choices: choices
+  });
+
+  let choice;
+  try{
+    choice = await prompt.run();
+    if(choice.length < 1){
+      // console.log('You Chose Nothing!');
+      await delay(2000);
+      removePackages();
+
+    }else{
+        //remove the choices from drive
+      let newPackages = [];
+      let packages = swarmJson.apps;
+      for(var i = 0; i < packages.length; i++) {
+        if(isInArray(packages[i]['folder'],choice)){
+          console.log("Removing "+packages[i]['name']+"...");
+          fs.rmdirSync(projectsRoot+projectFolder+"/"+packages[i]['folder']);
+          await delay(1000);
+
+          // // console.log("Removing "+packages[i]['name']+" from swarm info...");
+          // await delay(1000);
+
+        }
+        else{
+          newPackages.push(packages[i]);
+        }
+      }
+      swarmJson.apps = newPackages;
+      fs.writeFileSync(projectsRoot+projectFolder+'/swarm.json', JSON.stringify(swarmJson, null, 2));      // console.log(res.stdout + res.stderr);
+      await delay(1000);
+      setProject(projectFolder,swarmJson);
+      await delay(1000);
+      welcome();
+    }
+  }
+  catch(error){
+    // console.log(error);
+    welcome();
+    return false;
+  }
+}
+
+
+async function runPackagesLocal(){
+
+  let deployedList = [];
+
+  console.clear();
+  console.log(
+    chalk.yellow(
+      figlet.textSync(cliName, { horizontalLayout: 'full' })
+    )
+  );
+
+
+  let choices = [];
+
+  for(var i = 0; i < swarmJson.packages.length; i++) {
+    choices.push({name:swarmJson.packages[i], value: swarmJson.packages[i]});
+  }
+
+  let prompt = new MultiSelect({
+    name: 'value',
+    message: 'Pick packages to run locally!',
+    limit: swarmJson.packages.length,
+    choices: choices
+  });
+
+  let choice;
+  try{
+    choice = await prompt.run();
+    if(choice.length < 1){
+      // console.log('You Chose Nothing!');
+      await delay(2000);
+      runPackagesLocal();
+
+    }else{
+        //remove the choices from drive
+        let retries=0;
+        let runningQueue = [];
+        let remainingQueue = [];
+        for(var i = 0; i < choice.length; i++) {
+            runningQueue.push(choice[i]);
+        }
+
+
+          for(var i = 0; i < swarmInfoQueue.length; i++) {
+
+            if(typeof(swarmInfoQueue[i]['app']) != 'undefined' || (typeof(swarmInfoQueue[i]['scope']) == 'undefined' || swarmInfoQueue[i]['scope'] != 'global') && typeof(swarmInfoQueue[i]['package']) != 'undefined' && !isInArray(swarmInfoQueue[i]['package'],runningQueue)){ continue; }
+
+            console.log("Copying swarm info for "+swarmInfoQueue[i]['package']+"...");
+
+            try{
+              let object = {};
+              for(var i2 = 0; i2 < swarmInfoQueue[i]['objects'].length; i2++) {
+                object[swarmInfoQueue[i]['objects'][i2]] = swarmJson[swarmInfoQueue[i]['objects'][i2]];
+              }
+              fs.writeFileSync(projectsRoot+projectFolder+'/'+swarmInfoQueue[i]['package']+'/swarm.json', JSON.stringify(object, null, 2));      // console.log(res.stdout + res.stderr);
+            }
+            catch(error){
+              console.log("Copy Failed!");
+              console.log(error);
+            }
+
+
+          }
+
+
+        // console.log(runningQueue);
+        while(runningQueue.length > 0 && retries<retrySettings.deploy){
+
+              remainingQueue = [];
+              for(var i = 0; i < runningQueue.length; i++) {
+                console.log("Starting "+runningQueue[i]+"...");
+                try{
+                  let folder = projectsRoot+projectFolder+"/"+runningQueue[i];
+                  let res = spawn('npm run start', { stdio: 'inherit', shell: true, cwd: folder});
+                  // console.log(res.stdout + res.stderr);
+                  deployedList.push(runningQueue[i]);
+                }
+                catch(error){
+                  console.log("Starting Failed. Trying Later...");
+                  remainingQueue.push(runningQueue[i]);
+                }
+              }
+
+              runningQueue = [];
+              for(var i = 0; i < remainingQueue.length; i++) {
+                  runningQueue.push(remainingQueue[i]);
+              }
+
+
+
+              retries++;
+
+        }
+
+
+
+        // let date_end = new Date();
+        // let timestamp_end = date_end.getTime();
+        //
+        // // console.clear();
+        // console.log(
+        //   chalk.yellow(
+        //     figlet.textSync(cliName, { horizontalLayout: 'full' })
+        //   )
+        // );
+        // console.log('Successfully Deployed '+deployedList.length+' Packages:');
+        //
+        // for(var i = 0; i < deployedList.length; i++) {
+        //   console.log(deployedList[i]);
+        // }
+        //
+        // let timeInMinutes = timestamp_end-timestamp_start;
+        //     timeInMinutes = timeInMinutes/60000;
+        //
+        // console.log('');
+        // console.log('Took '+timeInMinutes+' Minutes.');
+
+    }
+  }
+  catch(error){
+    // console.log(error);
+    // welcome();
+    return false;
+  }
+
+
+
+}
+
+
+async function runAppsLocal(){
+
+  let deployedList = [];
+
+  console.clear();
+  console.log(
+    chalk.yellow(
+      figlet.textSync(cliName, { horizontalLayout: 'full' })
+    )
+  );
+
+
+  let choices = [];
+
+  for(var i = 0; i < swarmJson.apps.length; i++) {
+    choices.push({name:swarmJson.apps[i].name, value: swarmJson.apps[i].folder});
+  }
+
+  let prompt = new MultiSelect({
+    name: 'value',
+    message: 'Pick apps to run locally!',
+    limit: swarmJson.apps.length,
+    choices: choices
+  });
+
+  let choice;
+  try{
+    choice = await prompt.run();
+    if(choice.length < 1){
+      // console.log('You Chose Nothing!');
+      await delay(2000);
+      runAppsLocal();
+
+    }else{
+
+
+        //remove the choices from drive
+        let retries=0;
+        let runningQueue = [];
+        let remainingQueue = [];
+        for(var i = 0; i < choice.length; i++) {
+          for(var i2 = 0; i2 < swarmJson.apps.length; i2++) {
+            if(choice[i] == swarmJson.apps[i2].name){
+              runningQueue.push(swarmJson.apps[i2]);
+            }
+          }
+        }
+
+
+        for(var i = 0; i < swarmInfoQueue.length; i++) {
+
+          if( (typeof(swarmInfoQueue[i]['app']) == 'undefined' && typeof(swarmInfoQueue[i]['package']) != 'undefined') &&  !isInArray(swarmInfoQueue[i]['app'],runningQueue) ){ continue; }
+
+          console.log("Copying swarm info for "+swarmInfoQueue[i]['app']+"...");
+
+          try{
+            let object = {};
+            for(var i2 = 0; i2 < swarmInfoQueue[i]['objects'].length; i2++) {
+              object[swarmInfoQueue[i]['objects'][i2]] = swarmJson[swarmInfoQueue[i]['objects'][i2]];
+            }
+            fs.writeFileSync(projectsRoot+projectFolder+'/'+swarmInfoQueue[i]['folder']+'/src/app/swarm.json', JSON.stringify(object, null, 2));      // console.log(res.stdout + res.stderr);
+          }
+          catch(error){
+            console.log("Copy Failed!");
+            console.log(error);
+          }
+
+
+        }
+
+
+        // console.log(runningQueue);
+        while(runningQueue.length > 0 && retries<retrySettings.deploy){
+
+              remainingQueue = [];
+              for(var i = 0; i < runningQueue.length; i++) {
+                console.log("Starting "+runningQueue[i].name+"...");
+                try{
+                  let folder = projectsRoot+projectFolder+"/"+runningQueue[i].folder;
+                 let res = spawn(runningQueue[i].local, { stdio: 'inherit', shell: true, cwd: folder});
+                  // console.log(res.stdout + res.stderr);
+                  deployedList.push(runningQueue[i]);
+                }
+                catch(error){
+                  console.log("Starting Failed. Trying Later...");
+                  remainingQueue.push(runningQueue[i]);
+                }
+              }
+
+              runningQueue = [];
+              for(var i = 0; i < remainingQueue.length; i++) {
+                  runningQueue.push(remainingQueue[i]);
+              }
+
+
+
+              retries++;
+
+        }
+
+
+
+        let date_end = new Date();
+        let timestamp_end = date_end.getTime();
+
+        // console.clear();
+        // console.log(
+        //   chalk.yellow(
+        //     figlet.textSync(cliName, { horizontalLayout: 'full' })
+        //   )
+        // );
+        // console.log('Successfully Deployed '+deployedList.length+' Packages:');
+        //
+        // for(var i = 0; i < deployedList.length; i++) {
+        //   console.log(deployedList[i]);
+        // }
+        //
+        // let timeInMinutes = timestamp_end-timestamp_start;
+        //     timeInMinutes = timeInMinutes/60000;
+        //
+        // console.log('');
+        // console.log('Took '+timeInMinutes+' Minutes.');
+
+    }
+  }
+  catch(error){
+    // console.log(error);
+    // welcome();
     return false;
   }
 }
