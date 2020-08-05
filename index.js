@@ -970,11 +970,18 @@ async function runAppsLocal(){
             }
           }
         }
-
+        let runningQueueFolders = [];
+        for(var i = 0; i < choice.length; i++) {
+          for(var i2 = 0; i2 < swarmJson.apps.length; i2++) {
+            if(choice[i] == swarmJson.apps[i2].name){
+              runningQueueFolders.push(swarmJson.apps[i2]['folder']);
+            }
+          }
+        }
 
         for(var i = 0; i < swarmInfoQueue.length; i++) {
 
-          if( (typeof(swarmInfoQueue[i]['app']) == 'undefined' && typeof(swarmInfoQueue[i]['package']) != 'undefined') &&  !isInArray(swarmInfoQueue[i]['app'],runningQueue) ){ continue; }
+          if( (typeof(swarmInfoQueue[i]['app']) == 'undefined' && typeof(swarmInfoQueue[i]['package']) != 'undefined') || !isInArray(swarmInfoQueue[i]['folder'],runningQueueFolders) ){ continue; }
 
           console.log("Copying swarm info for "+swarmInfoQueue[i]['app']+"...");
 
@@ -997,7 +1004,7 @@ async function runAppsLocal(){
 
           for(var i = 0; i < swarmInfoQueue.length; i++) {
 
-            if(typeof(swarmInfoQueue[i]['app']) != 'undefined' || (typeof(swarmInfoQueue[i]['scope']) == 'undefined')){ continue; }
+            if((typeof(swarmInfoQueue[i]['app']) != 'undefined' || typeof(swarmInfoQueue[i]['scope']) == 'undefined') || !isInArray(swarmInfoQueue[i]['scope'], runningQueueFolders)){ continue; }
 
             console.log("Copying swarm info for "+swarmInfoQueue[i]['package']+"...");
 
