@@ -9,7 +9,6 @@ const { spawn } = require('child_process');
 
 const fs = require('fs');
 
-
 let swarmJson;
 let swarmInfoQueue;
 let deployQueueJSON;
@@ -993,6 +992,31 @@ async function runAppsLocal(){
 
 
         }
+
+
+
+          for(var i = 0; i < swarmInfoQueue.length; i++) {
+
+            if(typeof(swarmInfoQueue[i]['app']) != 'undefined' || (typeof(swarmInfoQueue[i]['scope']) == 'undefined')){ continue; }
+
+            console.log("Copying swarm info for "+swarmInfoQueue[i]['package']+"...");
+
+            try{
+              let object = {};
+              for(var i2 = 0; i2 < swarmInfoQueue[i]['objects'].length; i2++) {
+                object[swarmInfoQueue[i]['objects'][i2]] = swarmJson[swarmInfoQueue[i]['objects'][i2]];
+              }
+              fs.writeFileSync(projectsRoot+projectFolder+'/'+swarmInfoQueue[i]['package']+'/swarm.json', JSON.stringify(object, null, 2));      // console.log(res.stdout + res.stderr);
+            }
+            catch(error){
+              console.log("Copy Failed!");
+              console.log(error);
+            }
+
+
+          }
+
+
 
 
         // console.log(runningQueue);
