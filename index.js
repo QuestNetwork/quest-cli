@@ -41,6 +41,7 @@ function logo(){
         'bc1qujrqa3s34r5h0exgmmcuf8ejhyydm8wwja4fmq'
       )
     );
+    console.log();
   }
   else if(Math.random() >= 0.8){
     console.log(
@@ -53,12 +54,12 @@ function logo(){
         '0xBC2A050E7B87610Bc29657e7e7901DdBA6f2D34E'
       )
     );
+    console.log();
   }
 
 
 
 
-  console.log();
 }
 
 async function coldStart(){
