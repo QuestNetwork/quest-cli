@@ -21,14 +21,49 @@ const version = "0.9.2";
 
 coldStart();
 
-async function coldStart(){
-
+function logo(){
   console.clear();
   console.log(
     chalk.yellow(
       figlet.textSync(cliName, { horizontalLayout: 'full' })
     )
   );
+
+
+  if(Math.random() >= 0.9){
+    console.log(
+      chalk.blue(
+        'If you like this CLI, tip Bitcoin to: '
+      )
+    );
+    console.log(
+      chalk.green(
+        'bc1qujrqa3s34r5h0exgmmcuf8ejhyydm8wwja4fmq'
+      )
+    );
+  }
+  else if(Math.random() >= 0.8){
+    console.log(
+      chalk.blue(
+        'If you like this CLI, tip Ethereum to: '
+      )
+    );
+    console.log(
+      chalk.green(
+        '0xBC2A050E7B87610Bc29657e7e7901DdBA6f2D34E'
+      )
+    );
+  }
+
+
+
+
+  console.log();
+}
+
+async function coldStart(){
+
+  logo();
 
   try{
     cliSwarmJson = JSON.parse(fs.readFileSync("./swarm.json"));
@@ -124,12 +159,7 @@ async function setProject(projectFolder, newSwarmJson = undefined){
 async function selectProject(){
 
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
   let folders = fs.readdirSync(projectsRoot);
   let choices = [];
@@ -198,12 +228,7 @@ async function selectProject(){
 }
 
 async function newSwarm(){
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
   let folderPrompt = new Input({
     message: 'What is the name for this swarm?',
@@ -235,12 +260,7 @@ async function newSwarm(){
 async function welcome(){
 
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
   console.log(chalk.yellow("Swarm: "+projectFolder));
 
   let values = [];
@@ -327,14 +347,7 @@ function delay(t, val = "") {
 
 async function deploySwarmPrepare(){
 
-
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
-
+  logo();
 
   let choices = [];
   for(var i = 0; i < deployQueueJSON.length; i++) {
@@ -374,12 +387,7 @@ async function deploySwarm(deployQueue = deployQueueJSON){
 
 
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
 
   for(var i = 0; i < swarmInfoQueue.length; i++) {
@@ -442,12 +450,7 @@ async function deploySwarm(deployQueue = deployQueueJSON){
   let date_end = new Date();
   let timestamp_end = date_end.getTime();
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
   console.log('Successfully Deployed '+deployedList.length+' Packages:');
 
   for(var i = 0; i < deployedList.length; i++) {
@@ -468,12 +471,7 @@ async function deploySwarm(deployQueue = deployQueueJSON){
 async function deploySwarmPrepare(){
 
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
 
   let choices = [];
@@ -514,12 +512,7 @@ async function hibernateCluster(deployQueue = deployQueueJSON){
 
 
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
 
   let retries=0;
@@ -556,12 +549,7 @@ async function hibernateCluster(deployQueue = deployQueueJSON){
   let date_end = new Date();
   let timestamp_end = date_end.getTime();
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
   console.log('Successfully Hibernated '+deployedList.length+' Packages:');
 
   for(var i = 0; i < deployedList.length; i++) {
@@ -580,12 +568,7 @@ async function hibernateCluster(deployQueue = deployQueueJSON){
 async function newPackage(){
 
 
-    console.clear();
-    console.log(
-      chalk.yellow(
-        figlet.textSync(cliName, { horizontalLayout: 'full' })
-      )
-    );
+    logo();
 
     let packagePrompt = new Input({
       message: 'What is the name for this package?',
@@ -624,12 +607,7 @@ async function newPackage(){
 async function newApp(){
 
 
-    console.clear();
-    console.log(
-      chalk.yellow(
-        figlet.textSync(cliName, { horizontalLayout: 'full' })
-      )
-    );
+    logo();
 
     let packagePrompt = new Input({
       message: 'What is the name for this app?',
@@ -666,12 +644,7 @@ async function newApp(){
 
 async function removePackages(){
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
 
   let choices = [];
@@ -731,12 +704,7 @@ async function removePackages(){
 
 async function removeApps(){
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
 
   let choices = [];
@@ -927,12 +895,7 @@ async function runAppsLocal(){
 
   let deployedList = [];
 
-  console.clear();
-  console.log(
-    chalk.yellow(
-      figlet.textSync(cliName, { horizontalLayout: 'full' })
-    )
-  );
+  logo();
 
 
   let choices = [];
