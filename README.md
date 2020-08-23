@@ -32,9 +32,13 @@ with NPM 5.5.1 or higher.
 
 ## Usage
 
+Local installation:
+
 ```bash
 node .
 ```
+
+We recommend to edit and place the ```qc``` file in your ```/bin``` folder for global accessibility.
 
 ## Package Requirements
 
