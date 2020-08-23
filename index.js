@@ -6,6 +6,8 @@ const { MultiSelect } = require('enquirer');
 const { Select } = require('enquirer');
 const { Input } = require('enquirer');
 const { spawn } = require('child_process');
+const path = require('path');
+
 
 const fs = require('fs');
 
@@ -87,26 +89,37 @@ async function coldStart(){
         await delay(2000);
         let folderPrompt = new Input({
           message: 'Where can we find your projects?',
-          initial: '../'
+          initial: '../../'
         });
         let choice = await folderPrompt.run();
-        if(choice.charAt(choice.length-1) != "/"){
-          choice += "/";
-        }
-        projectsRoot = choice;
-        cliSwarmJson['projectsRoot'] = projectsRoot;
 
-        let folders = fs.readdirSync(projectsRoot);
+        projectsRoot =  path.resolve(__dirname, choice);
+
+        if(projectsRoot.charAt(projectsRoot.length-1) != "/"){
+         projectsRoot += "/";
+        }
         let choices = [];
+        let folders;
+        cliSwarmJson['projectsRoot'] = projectsRoot;
+        try{
+          folders = fs.readdirSync(projectsRoot);
+        }
+        catch(error){
+          console.log(error);
+          await delay(20000);
+        }
+
+
         for(var i = 0; i < folders.length; i++) {
           try{
             let projectSwarmJson = JSON.parse(fs.readFileSync(projectsRoot+folders[i]+"/swarm.json"));
             if(projectSwarmJson.type != 'cliSettings'){
               choices.push( { name:projectSwarmJson.name, value: folders[i] });
             }
-
           }
           catch(error){
+            console.log(error);
+            await delay(20000);
 
           }
         }
@@ -117,7 +130,6 @@ async function coldStart(){
           choices: choices
         });
         choice = await defaultProjectPrompt.run();
-
         for(var i = 0; i < choices.length; i++) {
           if(choice == choices[i].name){
             projectFolder = choices[i].value;
