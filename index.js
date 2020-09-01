@@ -278,7 +278,10 @@ async function welcome(){
 
   let values = [];
   if(typeof(swarmJson.apps) != "undefined" && swarmJson.apps.length > 0){
-    values.push("Run Swarm Apps Locally");
+    values.push("Run Swarm Web Apps Locally");
+  }
+  if(typeof(swarmJson.apps) != "undefined" && swarmJson.apps.length > 0){
+    values.push("Build Swarm Web Apps For Desktop (Windows/Mac/Linux)");
   }
 
   values.push("New App");
@@ -332,8 +335,11 @@ async function welcome(){
     else if(sel.value == "Remove Packages"){
       removePackages();
     }
-    else if(sel.value == "Run Swarm Apps Locally"){
+    else if(sel.value == "Run Swarm Web Apps Locally"){
       runAppsLocal();
+    }
+    else if(sel.value == "Build Swarm Web Apps For Desktop (Windows/Mac/Linux)"){
+      buildApps();
     }
     else if(sel.value == "Run Swarm Packages Locally"){
       runPackagesLocal();
@@ -342,6 +348,12 @@ async function welcome(){
   catch(error){
     selectProject();
   }
+}
+
+async function buildApps(){
+  console.log("Coming Soon.... (Sorry the CLI breaks now)");
+  await delay(5000);
+  throw('Feature not implemented yet, please donate or contribute!');
 }
 
 
