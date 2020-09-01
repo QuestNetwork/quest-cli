@@ -17,7 +17,8 @@ Ethereum:
 ## Note
 If you wish to collaborate, check out [our issue list](https://github.com/QuestNetwork/quest-cli/issues).
 
-**Warning;**
+**Warning**
+
 There's something wrong with how we use the path for the settings. Unfortunately we don't have the time to look into it right now, but it's safest (at least on Linux) to start the app from ```~/``` your home directory. If you can fix it, please contribute, the issue is: https://github.com/QuestNetwork/quest-cli/issues/1
 
 ## Prerequisites
